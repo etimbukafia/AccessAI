@@ -92,3 +92,4 @@ class TextAlternativeGenerator:
             "score": round(score, 2),
             "suggestions": suggestions
         }
+
