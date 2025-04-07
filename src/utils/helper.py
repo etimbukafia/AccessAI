@@ -1,3 +1,5 @@
+import queue
+
 # Accessiblity standards
 
 def return_wcag_guidelines():
@@ -148,3 +150,8 @@ def generate_summary(issues):
         "overall_score": overall_score,
         "top_recommendations": top_recommendations
     }
+
+def return_scan_results_and_queue():
+    scan_results = {}
+    scan_queue = queue.Queue()
+    return scan_results, scan_queue
