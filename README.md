@@ -1,0 +1,1 @@
+AI agent dedicated to enhancing web and mobile accessibility. Combines computer vision and natural language processing to automatically scan digital content, detect accessibility issues, and suggest corrective measures in real time
