@@ -114,3 +114,37 @@ def check_aria_attributes(soup):
             issues.append(f"Invalid aria-hidden value: {element}")
     
     return issues
+
+def generate_summary(issues):
+    """
+    Generate a summary of accessibility issues
+    """
+    severity_counts = {"critical": 0, "major": 0, "minor": 0}
+    type_counts = {"visual": 0, "semantic": 0, "system": 0}
+    
+    for issue in issues:
+        severity_counts[issue.severity] += 1
+        type_counts[issue.type] += 1
+    
+    overall_score = 100
+    # Deduct points based on severity
+    overall_score -= severity_counts["critical"] * 10
+    overall_score -= severity_counts["major"] * 5
+    overall_score -= severity_counts["minor"] * 1
+    
+    # Ensure score stays within 0-100 range
+    overall_score = max(0, min(100, overall_score))
+    
+    # Generate top recommendations (in a real app, this would be more sophisticated)
+    top_recommendations = []
+    critical_issues = [issue for issue in issues if issue.severity == "critical"]
+    for issue in critical_issues[:3]:  # Get top 3 critical issues
+        top_recommendations.append(issue.recommendation)
+    
+    return {
+        "total_issues": len(issues),
+        "severity_counts": severity_counts,
+        "type_counts": type_counts,
+        "overall_score": overall_score,
+        "top_recommendations": top_recommendations
+    }
