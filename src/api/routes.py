@@ -3,10 +3,14 @@ from models import ScanRequest, ScanResult
 from datetime import datetime
 import uuid
 from utils.helper import return_scan_results_and_queue
-from fastapi import HTTPException
+from fastapi import HTTPException, FastAPI
+from typing import List
+from scanner.worker import scan_queue, scan_results
 
-scan_results, scan_queue = return_scan_results_and_queue()
+app = FastAPI(title="AccessAI API", description="AI Accessibility Insight Agent")
 
+
+@app.post("/scan", response_model=ScanResult)
 async def create_scan(scan_request: ScanRequest, background_tasks: BackgroundTasks):
     """
     Endpoint to start a new accessibility scan
@@ -31,12 +35,24 @@ async def create_scan(scan_request: ScanRequest, background_tasks: BackgroundTas
     
     return scan_result
 
+@app.get("/scan/{scan_id}", response_model=ScanResult)
+async def get_scan_result(scan_id: str):
+    """
+    Endpoint to retrieve scan results
+    """
+    if scan_id not in scan_results:
+        raise HTTPException(status_code=404, detail="Scan not found")
+    
+    return scan_results[scan_id]
+
+@app.get("/scans", response_model=List[ScanResult])
 async def list_scans():
     """
     Endpoint to list all scans
     """
     return list(scan_results.values())
 
+@app.delete("/scan/{scan_id}")
 async def delete_scan(scan_id: str):
     """
     Endpoint to delete a scan
@@ -46,4 +62,3 @@ async def delete_scan(scan_id: str):
     
     del scan_results[scan_id]
     return {"status": "deleted"}
-

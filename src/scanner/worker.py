@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 import logging
 import threading
+import queue
 
 logging.basicConfig(
     level=logging.INFO,
@@ -11,13 +12,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger("accessai")
 
+# Initialize the scan results and queue
+global scan_results, scan_queue
+scan_results = {}
+scan_queue = queue.Queue()
+
 def worker():
     """
     Background worker that processes the scan queue
     """
     while True:
         try:
-            scan_results, scan_queue = return_scan_results_and_queue()
+            
             scan_id, url, scan_type, callback_url = scan_queue.get()
             
             # Update status to in_progress
@@ -53,6 +59,14 @@ def worker():
         finally:
             scan_queue.task_done()
 
-# Start the worker thread
-worker_thread = threading.Thread(target=worker, daemon=True)
-worker_thread.start()
+def start_worker():
+    """
+    Start the background worker thread
+    """
+    logger.info("Starting background worker thread")
+    
+    # Start the worker thread
+    worker_thread = threading.Thread(target=worker, daemon=True)
+    worker_thread.start()
+    logger.info("Background worker thread started")
+    return worker_thread
